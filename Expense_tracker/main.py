@@ -36,6 +36,7 @@ def add_expense(date,amount,category,subcategory,note):
 def list_expense(start_date,end_date):
     """list all expenses from the database."""
     with sqlite3.connect(DB_PATH) as c:
+
         cur = c.execute("""
         SELECT id,date,amount,category,subcategorynote 
         FROM expense Where ? between ?
@@ -43,8 +44,11 @@ def list_expense(start_date,end_date):
 
         cols = [c[0] for c in cur.description]
         return [dict(zip(cols,r)) for r in cur.fetchall()]
+
+
 @mcp.tool()
 def summarize(start_date,end_date,category=None):
+        """Summarize expenses by category within an inclusive date range"""
         with sqlite3.connect(DB_PATH) as c:
             query=("""
             SELECT category , SUM(AMOUNT) AS total_amount
@@ -63,4 +67,4 @@ def summarize(start_date,end_date,category=None):
             return [dict(zip(cols,r)) for r in cur.fetchall()]
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="stdio")
